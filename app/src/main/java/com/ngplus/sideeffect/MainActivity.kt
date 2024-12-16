@@ -30,27 +30,29 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MainComposableRememberUpdateState(name = "Android")
+                    MainDisposableEffectComposableRecompositionWorkInCoroutine(name = "Android")
                 }
             }
         }
     }
 }
+
 /**************LaunchedEffect*******************/
 @Composable
 fun OrderLaunchedEffect(name: String) {
-    Log.i("Side_effect_Tuto","before compose")
+    Log.i("Side_effect_Tuto", "before compose")
     Text(text = "Hello $name!")
-    LaunchedEffect(key1 = true){
-        Log.i("Side_effect_Tuto","LaunchedEffect")
+    LaunchedEffect(key1 = true) {
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
     }
-    Log.i("Side_effect_Tuto","after compose")
+    Log.i("Side_effect_Tuto", "after compose")
 }
 // display
 /*
     before compose
     after compose
     LaunchedEffect
+    explanation : LaunchedEffect is launched only if the composition is successful
 */
 
 /**************LaunchedEffect*******************/
@@ -59,17 +61,20 @@ fun LaunchedEffectWhenStateChanged(name: String) {
     val changeableState = remember {
         mutableStateOf(0)
     }
-    Log.i("Side_effect_Tuto","before compose ")
+    Log.i("Side_effect_Tuto", "before compose ")
     Button(
         colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray),
-        onClick = {changeableState.value += 1}
-    ){
+        onClick = {
+            changeableState.value += 1
+            Log.i("Side_effect_Tuto", "Clicked")
+        }
+    ) {
         Text(text = "Increase ${changeableState.value}")
     }
-    LaunchedEffect(key1 = true){
-        Log.i("Side_effect_Tuto","LaunchedEffect")
+    LaunchedEffect(key1 = true) {
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
     }
-    Log.i("Side_effect_Tuto","after compose ")
+    Log.i("Side_effect_Tuto", "after compose ")
 }
 // display
 /*
@@ -78,6 +83,37 @@ fun LaunchedEffectWhenStateChanged(name: String) {
     LaunchedEffect
 when clicked
     none
+-------------
+explanation :
+LaunchedEffect launched once because of key is the same key
+ */
+/**************LaunchedEffect*******************/
+@Composable
+fun OrderLaunchedEffectWhenNothingChanged(name: String) {
+    Log.i("Side_effect_Tuto", "before compose")
+    val notChanged = remember { mutableStateOf(0) }
+    Button(
+        onClick = {
+            notChanged.value = 0
+            Log.i("Side_effect_Tuto", "Clicked")
+        }
+    ) {
+        Text(text = "Increase ${notChanged.value}")
+
+    }
+    LaunchedEffect(key1 = notChanged) {
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
+    }
+    Log.i("Side_effect_Tuto", "after compose")
+}
+/*
+display
+before compose
+after compose
+LaunchedEffect
+explanation
+------
+nothing is fired, because value is not changed
  */
 /**************LaunchedEffect*******************/
 @Composable
@@ -85,22 +121,25 @@ fun LaunchCoroutineLaunchedEffect(name: String) {
     val changeableState = remember {
         mutableStateOf(0)
     }
-    Log.i("Side_effect_Tuto","before compose ")
+    Log.i("Side_effect_Tuto", "before compose ")
     Button(
-        onClick = {changeableState.value += 1}
-    ){
+        onClick = {
+            changeableState.value += 1
+            Log.i("Side_effect_Tuto", "Clicked")
+        }
+    ) {
         Text(text = "Increase ${changeableState.value}")
     }
-    LaunchedEffect(key1 = true){
-        var i=20
-        while (i>0){
+    LaunchedEffect(key1 = true) {
+        var i = 20
+        while (i > 0) {
             delay(1000)
             i--
-            Log.i("Side_effect_Tuto","i still counting $i")
+            Log.i("Side_effect_Tuto", "i still counting $i")
         }
-        Log.i("Side_effect_Tuto","LaunchedEffect")
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
     }
-    Log.i("Side_effect_Tuto","after compose ")
+    Log.i("Side_effect_Tuto", "after compose ")
 }
 // display
 /*
@@ -121,6 +160,8 @@ when clicked
 ..
 ..
     LaunchedEffect
+-------------
+Explanation : the code inside LaunchedEffect continue to operate even if a recomposition take place
  */
 /**************LaunchedEffect*******************/
 @Composable
@@ -128,16 +169,16 @@ fun LaunchedEffectWhenKeyLaunchedEffectChanged(name: String) {
     val changeableState = remember {
         mutableStateOf(0)
     }
-    Log.i("Side_effect_Tuto","before compose ")
+    Log.i("Side_effect_Tuto", "before compose ")
     Button(
-        onClick = {changeableState.value += 1}
-    ){
+        onClick = { changeableState.value += 1 }
+    ) {
         Text(text = "Increase ${changeableState.value}")
     }
-    LaunchedEffect(key1 = changeableState.value){
-        Log.i("Side_effect_Tuto","LaunchedEffect")
+    LaunchedEffect(key1 = changeableState.value) {
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
     }
-    Log.i("Side_effect_Tuto","after compose ")
+    Log.i("Side_effect_Tuto", "after compose ")
 }
 // display
 /*
@@ -148,6 +189,8 @@ when clicked
     before compose
     after compose
     LaunchedEffect
+-----------
+Explanation : given that the key change with each composition, LaunchedEffect is launched
  */
 /**************LaunchedEffect*******************/
 @Composable
@@ -155,52 +198,68 @@ fun LaunchCoroutineLaunchedEffectWhenKeyLaunchedEffectChanged(name: String) {
     val changeableState = remember {
         mutableStateOf(0)
     }
-    Log.i("Side_effect_Tuto","before compose ")
+    Log.i("Side_effect_Tuto", "before compose ")
     Button(
-        onClick = {changeableState.value += 1}
-    ){
+        onClick = {
+            changeableState.value += 1
+            Log.i("Side_effect_Tuto", "Clicked")
+        }
+    ) {
         Text(text = "Increase ${changeableState.value}")
     }
-    LaunchedEffect(key1 = changeableState.value){
-        var i=20
-        while (i>0){
+    LaunchedEffect(key1 = changeableState.value) {
+        var i = 20
+        while (i > 0) {
             delay(1000)
             i--
-            Log.i("Side_effect_Tuto","i still counting $i")
+            Log.i("Side_effect_Tuto", "i still counting $i")
         }
-        Log.i("Side_effect_Tuto","LaunchedEffect")
+        Log.i("Side_effect_Tuto", "LaunchedEffect")
     }
-    Log.i("Side_effect_Tuto","after compose ")
+    Log.i("Side_effect_Tuto", "after compose ")
 }
 // display
 /*
     before compose
     after compose
     LaunchedEffect
+    i still counting 19
+    i still counting 18
+    i still counting 17
 when clicked
     before compose
     after compose
     LaunchedEffect
+    i still counting 19
+    i still counting 18
+    i still counting 17
+-----------
+Explanation
+In the first composition, we enter to LaunchedEffect as normal
+since the key changes with each composition, when clicked, we authorize executing side Effect
  */
+
 /***************LaunchedEffect******************/
 @Composable
 fun LaunchedEffectWhenLeaveTheRecomposition(name: String) {
     val changeableState = remember {
         mutableStateOf(true)
     }
-    Log.i("Side_effect_Tuto","before compose ")
+    Log.i("Side_effect_Tuto", "before compose ")
     Button(
-        onClick = {changeableState.value = !changeableState.value}
-    ){
+        onClick = {
+            changeableState.value = !changeableState.value
+            Log.i("Side_effect_Tuto", "clicked")
+        }
+    ) {
         Text(text = "Increase ${changeableState.value}")
     }
-    if(changeableState.value){
-        LaunchedEffect(key1 = changeableState.value){
-            Log.i("Side_effect_Tuto","LaunchedEffect")
+    if (changeableState.value) {
+        LaunchedEffect(key1 = changeableState.value) {
+            Log.i("Side_effect_Tuto", "LaunchedEffect")
         }
     }
-
-    Log.i("Side_effect_Tuto","after compose ")
+    Log.i("Side_effect_Tuto", "after compose")
 }
 // display
 /*
@@ -208,33 +267,43 @@ fun LaunchedEffectWhenLeaveTheRecomposition(name: String) {
     after compose
     LaunchedEffect
 when clicked
+    clicked
     before compose
     after compose
 when clicked
     before compose
     after compose
     LaunchedEffect
+//Explanation
+    we know that LaunchedEffect is present when changeableState is true, and the key change,
+    once the LaunchEffect is present in composition, what is inside is executed
  */
 /**************LaunchedEffect*******************/
 @Composable
-fun LaunchSnackBarWhenStateChanged(name: String){
-    Log.i("Side_effect_Tuto","after compose ")
-    val changeableState = remember{
+fun LaunchSnackBarWhenStateChanged(name: String) {
+    Log.i("Side_effect_Tuto", "after compose ")
+    val changeableState = remember {
         mutableStateOf(false)
     }
     val scaffoldState = rememberScaffoldState()
     // when launched, SnackBar is not shown
-    if(changeableState.value){
-        LaunchedEffect(key1 = scaffoldState.snackbarHostState){
+    if (changeableState.value) {
+        LaunchedEffect(key1 = scaffoldState.snackbarHostState) {
             scaffoldState.snackbarHostState.showSnackbar("ici text snackBar")
         }
     }
-    Scaffold(scaffoldState = scaffoldState ) {
+    Scaffold(scaffoldState = scaffoldState) {
         Button(onClick = { changeableState.value = !changeableState.value }) {
-            Text(name)
+            Text("Toggle")
         }
     }
 }
+/*
+Display
+
+Explanation
+
+ */
 /*
 The coroutine will be cancelled if LaunchedEffect leaves the composition
  src: https://developer.android.com/jetpack/compose/side-effects
@@ -248,92 +317,112 @@ it'll be removed, and therefore, the coroutine will be cancelled.
  */
 /**********SideEffect**********/
 @Composable
-fun MainSideEffectComposableRecomposition(name: String){
-    val stateChangeable = remember{
+fun MainSideEffectComposableRecomposition(name: String) {
+    val stateChangeable = remember {
         mutableStateOf(false)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable ! ${stateChangeable.value}")
     }
-    SideEffect{
-        Log.i("Side_effect_Tuto","inside SideEffect")
+    SideEffect {
+        Log.i("Side_effect_Tuto", "inside SideEffect")
     }
 }
+/*
+display
+    Side_effect_Tuto
+Explanation
+    triggers when recomposition is completed successfully
+*/
+
 /**********DisposableEffect**********/
 /*
 Disposable recomposition
  */
 @Composable
-fun MainDisposableEffectComposableRecomposition(name: String){
-    val stateChangeable = remember{
+fun MainDisposableEffectComposableRecomposition(name: String) {
+    val stateChangeable = remember {
         mutableStateOf(false)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable ! ${stateChangeable.value}")
     }
-    DisposableEffectComposableRecomposition(name = name)
+    if(stateChangeable.value){
+        DisposableEffectComposableRecomposition(name = name)
+    }
 }
+
 @Composable
-fun DisposableEffectComposableRecomposition(name : String){
-    Log.i("Side_effect_Tuto","before DisposableEffect")
-    DisposableEffect(key1 = true){
-        Log.i("Side_effect_Tuto","inside DisposableEffect")
+fun DisposableEffectComposableRecomposition(name: String) {
+    Log.i("Side_effect_Tuto", "before DisposableEffect")
+    DisposableEffect(key1 = true) {
+        Log.i("Side_effect_Tuto", "inside DisposableEffect")
         onDispose {
-            Log.i("Side_effect_Tuto","inside Dispose DisposableEffect")
+            Log.i("Side_effect_Tuto", "inside Dispose DisposableEffect")
         }
     }
     Text(name, fontSize = 23.sp)
-    Log.i("Side_effect_Tuto","after DisposableEffect")
+    Log.i("Side_effect_Tuto", "after DisposableEffect")
 }
+
 /*
 when launched
+    none
+when clicked
     before DisposableEffect
     after DisposableEffect
     inside DisposableEffect
 when clicked
-    none
+    inside Dispose DisposableEffect
+
+Explanation
+    When leave the composition, onDispose is triggered
 */
 /*
 Disposable recomposition
  */
 @Composable
-fun MainDisposableEffectComposableRecompositionWorkInCoroutine(name: String){
-    val stateChangeable = remember{
-        mutableStateOf(false)
+fun MainDisposableEffectComposableRecompositionWorkInCoroutine(name: String) {
+    val stateChangeable = remember {
+        mutableStateOf(true)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable ! ${stateChangeable.value}")
     }
-    DisposableEffectComposableRecompositionWorkInCoroutine(name = name)
+    if(stateChangeable.value){
+        DisposableEffectComposableRecompositionWorkInCoroutine(name = name)
+    }
 }
+
 @Composable
-fun DisposableEffectComposableRecompositionWorkInCoroutine(name : String){
-    Log.i("Side_effect_Tuto","before DisposableEffect")
+fun DisposableEffectComposableRecompositionWorkInCoroutine(name: String) {
+    Log.i("Side_effect_Tuto", "before DisposableEffect")
     val scope = rememberCoroutineScope()
-    DisposableEffect(key1 = true){
-        Log.i("Side_effect_Tuto","inside DisposableEffect")
+    DisposableEffect(key1 = true) {
+        Log.i("Side_effect_Tuto", "inside DisposableEffect")
         scope.launch {
-            var i=20
-            while (i>0){
+            var i = 20
+            while (i > 0) {
                 delay(1000)
-                Log.i("Side_effect_Tuto","inside DisposableEffect some work $i")
+                Log.i("Side_effect_Tuto", "inside DisposableEffect some work $i")
                 i--
             }
         }
         onDispose {
             scope.cancel()
-            Log.i("Side_effect_Tuto","inside Dispose DisposableEffect")
+            Log.i("Side_effect_Tuto", "i'am leaving the composition")
         }
     }
     Text(name, fontSize = 23.sp)
-    Log.i("Side_effect_Tuto","after DisposableEffect")
+    Log.i("Side_effect_Tuto", "after DisposableEffect")
 }
+
 /*
 when launched
     before DisposableEffect
@@ -344,30 +433,28 @@ when launched
     inside DisposableEffect some work 18
     inside DisposableEffect some work 17
 when clicked
-    inside DisposableEffect some work 17
-    inside DisposableEffect some work 16
-    inside DisposableEffect some work 15
+    i'am leaving the composition
 when clicked
-    inside DisposableEffect some work 14
     ...
 */
 /*
 Disposable leave the recomposition
  */
 @Composable
-fun MainDisposableEffectComposableWorkInCoroutineAndRecomposition(name: String){
-    val stateChangeable = remember{
+fun MainDisposableEffectComposableWorkInCoroutineAndRecomposition(name: String) {
+    val stateChangeable = remember {
         mutableStateOf(false)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable ! ${stateChangeable.value}")
     }
-    if (stateChangeable.value){
+    if (stateChangeable.value) {
         DisposableEffectComposableRecompositionWorkInCoroutine(name = name)
     }
 }
+
 /*
 when launched
     none
@@ -395,30 +482,31 @@ when clicked
 Disposable leave the recomposition
  */
 @Composable
-fun MainDisposableEffectComposable(name: String){
-    val stateChangeable = remember{
+fun MainDisposableEffectComposable(name: String) {
+    val stateChangeable = remember {
         mutableStateOf(false)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable ! ${stateChangeable.value}")
     }
-    if (stateChangeable.value){
+    if (stateChangeable.value) {
         DisposableEffectComposable(name = name)
     }
 }
+
 @Composable
-fun DisposableEffectComposable(name : String){
-    Log.i("Side_effect_Tuto","before DisposableEffect")
-    DisposableEffect(key1 = true){
-        Log.i("Side_effect_Tuto","inside DisposableEffect")
+fun DisposableEffectComposable(name: String) {
+    Log.i("Side_effect_Tuto", "before DisposableEffect")
+    DisposableEffect(key1 = true) {
+        Log.i("Side_effect_Tuto", "inside DisposableEffect")
         onDispose {
-            Log.i("Side_effect_Tuto","inside Dispose DisposableEffect")
+            Log.i("Side_effect_Tuto", "inside Dispose DisposableEffect")
         }
     }
     Text(name, fontSize = 23.sp)
-    Log.i("Side_effect_Tuto","after DisposableEffect")
+    Log.i("Side_effect_Tuto", "after DisposableEffect")
 }
 /*
 when launched
@@ -435,66 +523,70 @@ when clicked
 Disposable state changed
  */
 @Composable
-fun MainDisposableEffectComposableWithState(name: String){
-    val stateChangeable = remember{
+fun MainDisposableEffectComposableWithState(name: String) {
+    val stateChangeable = remember {
         mutableStateOf(false)
     }
     Button(
-        onClick = {stateChangeable.value = !stateChangeable.value}
-    ){
+        onClick = { stateChangeable.value = !stateChangeable.value }
+    ) {
         Text("Changeable !")
     }
-    DisposableEffectComposableWithState(name = name, state= stateChangeable.value)
+    DisposableEffectComposableWithState(name = name, state = stateChangeable.value)
 }
+
 @Composable
-fun DisposableEffectComposableWithState(name : String, state : Boolean){
-    Log.i("Side_effect_Tuto","before DisposableEffect")
-    DisposableEffect(key1 = state){
+fun DisposableEffectComposableWithState(name: String, state: Boolean) {
+    Log.i("Side_effect_Tuto", "before DisposableEffect")
+    DisposableEffect(key1 = state) {
         val count = 1
-        Log.i("Side_effect_Tuto","inside DisposableEffect/$count")
+        Log.i("Side_effect_Tuto", "inside DisposableEffect/$count")
         onDispose {
-            Log.i("Side_effect_Tuto","inside Dispose DisposableEffect/$count")
+            Log.i("Side_effect_Tuto", "inside Dispose DisposableEffect/$count")
         }
     }
     Text(name, fontSize = 23.sp)
-    Log.i("Side_effect_Tuto","after DisposableEffect")
+    Log.i("Side_effect_Tuto", "after DisposableEffect")
 }
+
 @Composable
-fun MainLifecycleEventDisposableEffectComposableWithState(name : String){
-    val state = remember{
+fun MainLifecycleEventDisposableEffectComposableWithState(name: String) {
+    val state = remember {
         mutableStateOf(false)
     }
-    Button(onClick = { state.value = !state.value}) {
+    Button(onClick = { state.value = !state.value }) {
         Text("State")
     }
-    LifecycleEventDisposableEffectComposableWithState(name,state.value)
+    LifecycleEventDisposableEffectComposableWithState(name, state.value)
 }
+
 @Composable
-fun LifecycleEventDisposableEffectComposableWithState(name : String, state : Boolean){
-    Log.i("Side_effect_Tuto","before DisposableEffect")
-    val lifecycle  = LocalLifecycleOwner.current
-    DisposableEffect(key1 = state){
-        val observer = LifecycleEventObserver{ _ , event ->
-            if(event == Lifecycle.Event.ON_START){
-                Log.i("Side_effect_Tuto","ON_START")
+fun LifecycleEventDisposableEffectComposableWithState(name: String, state: Boolean) {
+    Log.i("Side_effect_Tuto", "before DisposableEffect")
+    val lifecycle = LocalLifecycleOwner.current
+    DisposableEffect(key1 = state) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                Log.i("Side_effect_Tuto", "ON_START")
             }
         }
         lifecycle.lifecycle.addObserver(observer)
-        Log.i("Side_effect_Tuto","inside DisposableEffect")
+        Log.i("Side_effect_Tuto", "inside DisposableEffect")
         onDispose {
             lifecycle.lifecycle.removeObserver(observer)
-            Log.i("Side_effect_Tuto","inside Dispose DisposableEffect/")
+            Log.i("Side_effect_Tuto", "inside Dispose DisposableEffect/")
         }
     }
-    Log.i("Side_effect_Tuto","after DisposableEffect")
+    Log.i("Side_effect_Tuto", "after DisposableEffect")
 }
+
 /**********rememberCoroutineScope***********/
 
 @Composable
-fun MainRememberCoroutineScope(name : String){
-    LaunchedEffect(key1 = false){
+fun MainRememberCoroutineScope(name: String) {
+    LaunchedEffect(key1 = false) {
     }
-    val text = remember{
+    val text = remember {
         mutableStateOf("text \n")
     }
     val scope = rememberCoroutineScope()
@@ -502,20 +594,22 @@ fun MainRememberCoroutineScope(name : String){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ) {
-        Button(onClick = { scope.launch(Dispatchers.IO) {
-            var i = 1
-            while (i<10){
-                delay(1_000)
-                Log.i("Side_effect_Tuto","${i++}")
-                text.value = "$i  \n ${text.value}"
+        Button(onClick = {
+            scope.launch(Dispatchers.IO) {
+                var i = 1
+                while (i < 10) {
+                    delay(1_000)
+                    Log.i("Side_effect_Tuto", "${i++}")
+                    text.value = "$i  \n ${text.value}"
+                }
             }
-        } }) {
+        }) {
             Text("launch count")
         }
 
         Button(onClick = {
             scope.cancel()
-            Log.i("Side_effect_Tuto","count is cancelled")
+            Log.i("Side_effect_Tuto", "count is cancelled")
             text.value = "canceled ${text.value}"
         }) {
             Text("Cancel count")
@@ -528,15 +622,15 @@ fun MainRememberCoroutineScope(name : String){
 
 /***************rememberUpdatedState******************/
 @Composable
-fun MainComposableWithoutRememberUpdateState(name : String){
+fun MainComposableWithoutRememberUpdateState(name: String) {
 
-    var changeableIndex by remember{
+    var changeableIndex by remember {
         mutableStateOf("")
     }
-    Log.i("Side_effect_Tuto","outside 0")
+    Log.i("Side_effect_Tuto", "outside 0")
     Button(
-        onClick = {changeableIndex += "\nclicked"}
-    ){
+        onClick = { changeableIndex += "\nclicked" }
+    ) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.End
@@ -546,13 +640,14 @@ fun MainComposableWithoutRememberUpdateState(name : String){
     }
     ComposableWithoutRememberUpdateState(changeableIndex)
 }
+
 @Composable
-fun ComposableWithoutRememberUpdateState(stateful : String){
-    Log.i("Side_effect_Tuto","recall ComposableRememberUpdateState")
-    LaunchedEffect(key1 = Unit){
-        Log.i("Side_effect_Tuto","before delay")
+fun ComposableWithoutRememberUpdateState(stateful: String) {
+    Log.i("Side_effect_Tuto", "recall ComposableRememberUpdateState")
+    LaunchedEffect(key1 = Unit) {
+        Log.i("Side_effect_Tuto", "before delay")
         delay(2000)
-        Log.i("Side_effect_Tuto","after function $stateful")
+        Log.i("Side_effect_Tuto", "after function $stateful")
     }
 }
 /*
@@ -570,14 +665,14 @@ clicked
  */
 /***********************RememberUpdateState*************************/
 @Composable
-fun MainComposableRememberUpdateState(name : String){
-    var changeableIndex by remember{
+fun MainComposableRememberUpdateState(name: String) {
+    var changeableIndex by remember {
         mutableStateOf("")
     }
-    Log.i("Side_effect_Tuto","outside 0")
+    Log.i("Side_effect_Tuto", "outside 0")
     Button(
-        onClick = {changeableIndex += "\nclicked"}
-    ){
+        onClick = { changeableIndex += "\nclicked" }
+    ) {
         Column(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.End
@@ -587,16 +682,18 @@ fun MainComposableRememberUpdateState(name : String){
     }
     ComposableRememberUpdateState(changeableIndex)
 }
+
 @Composable
-fun ComposableRememberUpdateState(stateful : String){
+fun ComposableRememberUpdateState(stateful: String) {
     val changeableState by rememberUpdatedState(newValue = stateful)
-    Log.i("Side_effect_Tuto","recall ComposableRememberUpdateState")
-    LaunchedEffect(key1 = Unit){
-        Log.i("Side_effect_Tuto","before delay")
+    Log.i("Side_effect_Tuto", "recall ComposableRememberUpdateState")
+    LaunchedEffect(key1 = Unit) {
+        Log.i("Side_effect_Tuto", "before delay")
         delay(2000)
         println("inhere $changeableState")
     }
 }
+
 /*
 launched
     outside 0
